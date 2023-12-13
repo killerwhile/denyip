@@ -24,6 +24,7 @@ type Checker struct {
 // Config the plugin configuration.
 type Config struct {
 	IPDenyList []string `json:"ipDenyList,omitempty"`
+	Verbose    bool     `json:"verbose,omitempty"`
 }
 
 // CreateConfig creates the default plugin configuration.
@@ -36,6 +37,7 @@ type denyIP struct {
 	next    http.Handler
 	checker *Checker
 	name    string
+	verbose bool
 }
 
 // New creates a new DenyIP plugin.
@@ -49,6 +51,7 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 		checker: checker,
 		next:    next,
 		name:    name,
+		verbose: config.Verbose,
 	}, nil
 }
 
@@ -63,7 +66,9 @@ func (a *denyIP) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		if isBlocked {
-			log.Printf("denyIP: request denied [%s]", reqIPAddr[i])
+			if a.verbose {
+				log.Printf("denyIP: request denied [%s]", reqIPAddr[i])
+			}
 			rw.WriteHeader(http.StatusForbidden)
 
 			return

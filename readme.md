@@ -125,3 +125,24 @@ http:
         - url: http://localhost:5000/
         passHostHeader: false
 ```
+
+Using Kubernetes CRDs
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: deny-ips
+  namespace: broker-v20
+spec:
+  plugin:
+    denyip:
+      ipDenyList:
+        - 24.0.0.0/12
+        - 24.16.0.0/13
+        - 24.30.0.0/17
+# ...
+        - 34.90.170.4/32
+---
+
+```
